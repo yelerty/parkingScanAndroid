@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "123456789",
+    "project_id": "parking-scanner-android",
+    "storage_bucket": "parking-scanner-android.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:123456789:android:abc123def456",
+        "android_client_info": {
+          "package_name": "com.parkwhere.scanner"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "123456789-abc123def456.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDummyKeyForTestingPurposes123456789"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "123456789-abc123def456.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      },
+      "admob_app_id": "ca-app-pub-3940256099942544~3347511713"
+    }
+  ],
+  "configuration_version": "1"
+}

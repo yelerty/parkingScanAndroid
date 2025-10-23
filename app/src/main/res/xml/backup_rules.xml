@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!--
+    Set android:allowBackup="true" and specify rules to determine what to back up.
+    Create full-backup-content with rules. Examples:
+
+    <include domain="file" path="file_to_backup.txt"/>
+    <exclude domain="database" path="non_backup_db.db"/>
+    -->
+</full-backup-content>

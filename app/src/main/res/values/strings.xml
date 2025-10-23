@@ -13,7 +13,7 @@
 
     <!-- Parking Record -->
     <string name="parking_code">주차 코드: %s</string>
-    <string name="parking_location">위치: %.6f, %.6f</string>
+    <string name="parking_location" formatted="false">위치: %.6f, %.6f</string>
     <string name="parking_time">%s</string>
 
     <!-- Settings -->
