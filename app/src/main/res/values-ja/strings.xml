@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">ParkWhere Scanner</string>
+
+    <!-- Main Activity -->
+    <string name="app_title">駐車位置検索</string>
+    <string name="scan_status_scanning">スキャン中…</string>
+    <string name="scan_status_idle">スキャン待機中</string>
+    <string name="empty_state_message">駐車記録がありません</string>
+    <string name="empty_state_subtitle">下にスワイプしてスキャン開始</string>
+    <string name="pull_to_refresh">引き下げて更新</string>
+
+    <!-- Settings -->
+    <string name="settings_title">設定</string>
+    <string name="license_plate_section">ナンバープレート登録</string>
+    <string name="license_plate_hint">私の車のナンバー</string>
+    <string name="save_license_plate">保存</string>
+    <string name="license_plate_saved">ナンバープレートが保存されました</string>
+    <string name="management_section">管理</string>
+    <string name="view_usage_guide">使い方を見る</string>
+    <string name="language_setting">言語設定</string>
+    <string name="language">言語</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_title">駐車位置検索の使い方</string>
+    <string name="onboarding_indoor_title">屋内・地下駐車場</string>
+    <string name="onboarding_indoor_description">駐車場の柱や床のアルファベット、数字を写真に撮ってください。（例：B2-14、A-123）</string>
+    <string name="onboarding_outdoor_title">屋外駐車場</string>
+    <string name="onboarding_outdoor_description">車のナンバープレートを写真に撮ってください。アプリが自動認識します。</string>
+    <string name="onboarding_settings_title">設定のヒント</string>
+    <string name="onboarding_settings_description">設定で車のナンバーを登録すると、より正確な認識が可能です。</string>
+    <string name="onboarding_got_it">了解</string>
+</resources>

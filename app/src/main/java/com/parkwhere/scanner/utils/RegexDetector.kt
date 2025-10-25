@@ -15,6 +15,14 @@ class RegexDetector {
     // This pattern identifies a potential second part of a multi-line code (numbers only).
     private val suffixRegex = Pattern.compile("^\\d{1,4}$")
 
+    // Pattern for "number-code-number" format (e.g., "29 B2 29")
+    // This captures parking codes where the same number appears on both sides
+    private val numberCodeNumberRegex = Pattern.compile("^(\\d{1,4})\\s+([A-Z]\\d*F?|\\d+F|[가-힣]|지하\\d+층|P\\d+)\\s+\\1$")
+
+    // Pattern for repeated numbers (e.g., "29 29" when text is very large)
+    // This captures cases where only the parking number is visible twice
+    private val repeatedNumberRegex = Pattern.compile("^(\\d{1,4})\\s+\\1$")
+
     // Korean License Plate Regex: e.g., 12가3456, 123가4567
     private val licensePlateRegex = Pattern.compile("\\b(?:\\d{2,3}[가-힣][ -]?\\d{4}|[가-힣]{2}\\d{2}[가-힣][ -]?\\d{4})\\b")
 
@@ -22,10 +30,23 @@ class RegexDetector {
      * 주차 코드 유효성 검사 함수
      */
     private fun isValidParkingCode(code: String): Boolean {
-        // 8자 이상은 주차 코드가 아님
-        if (code.length >= 8) {
-            println("❌ 주차 코드 거부: 너무 긴 코드 (${code.length}자) - '$code'")
+        // 비어있거나 너무 짧은 경우
+        if (code.isEmpty() || code.length < 2) {
+            println("❌ 주차 코드 거부: 너무 짧은 코드 - '$code'")
             return false
+        }
+
+        // 숫자만 있는 경우는 유효 (반복 숫자 패턴으로 감지된 경우)
+        val numbersOnly = code.all { it.isDigit() }
+        if (numbersOnly) {
+            // 2~4자리 숫자는 유효한 주차 코드
+            if (code.length in 2..4) {
+                println("✅ 유효한 주차 코드 (숫자만): '$code' (${code.length}자)")
+                return true
+            } else {
+                println("❌ 주차 코드 거부: 숫자만 있지만 길이 부적절 - '$code' (${code.length}자)")
+                return false
+            }
         }
 
         // 숫자와 '-'만 있는 경우는 주차 코드가 아님
@@ -35,13 +56,7 @@ class RegexDetector {
             return false
         }
 
-        // 비어있거나 너무 짧은 경우
-        if (code.isEmpty() || code.length < 2) {
-            println("❌ 주차 코드 거부: 너무 짧은 코드 - '$code'")
-            return false
-        }
-
-        println("✅ 유효한 주차 코드: '$code'")
+        println("✅ 유효한 주차 코드: '$code' (${code.length}자)")
         return true
     }
 
@@ -52,33 +67,60 @@ class RegexDetector {
         // Clean up lines by trimming whitespace, converting to uppercase, and removing empty lines.
         val cleanLines = lines.map { it.trim().uppercase() }.filter { it.isNotEmpty() }
 
-        for ((index, line) in cleanLines.withIndex()) {
-            // Skip lines that are too long (more than 10 characters)
-            if (line.length > 10) continue
+        // Check if text is too long (likely not a parking code)
+        // If we have many long lines (15+ chars), it's probably not a parking sign
+        val longLines = cleanLines.filter { it.length >= 15 }
+        if (longLines.size >= 3) {
+            println("❌ 긴 텍스트 라인이 너무 많음 (${longLines.size}개, 15자 이상) - 주차 코드가 아닐 가능성 높음")
+            println("   샘플: ${longLines.take(3).joinToString(" / ")}")
+            return null
+        }
 
-            // 1. Check for a full, valid parking code on the current line.
+        for ((index, line) in cleanLines.withIndex()) {
+            // 1. Check for "number-code-number" pattern (e.g., "29 B2 29")
+            val numberCodeNumberMatcher = numberCodeNumberRegex.matcher(line)
+            if (numberCodeNumberMatcher.matches()) {
+                // Extract the middle part (the actual parking code)
+                val parkingCode = numberCodeNumberMatcher.group(2)
+                if (parkingCode != null) {
+                    println("✅ 숫자-코드-숫자 패턴 발견: '$line' -> 주차코드: '$parkingCode'")
+                    if (isValidParkingCode(parkingCode)) {
+                        return parkingCode
+                    }
+                }
+            }
+
+            // 2. Check for repeated number pattern (e.g., "29 29" - large text)
+            val repeatedNumberMatcher = repeatedNumberRegex.matcher(line)
+            if (repeatedNumberMatcher.matches()) {
+                // Extract the number (first capture group)
+                val parkingNumber = repeatedNumberMatcher.group(1)
+                if (parkingNumber != null) {
+                    println("✅ 반복 숫자 패턴 발견 (큰 글씨): '$line' -> 주차코드: '$parkingNumber'")
+                    // Repeated numbers are valid parking codes (2-4 digits)
+                    if (parkingNumber.length in 2..4) {
+                        return parkingNumber
+                    }
+                }
+            }
+
+            // 3. Check for a full, valid parking code on the current line.
             if (fullRegex.matcher(line).matches()) {
                 if (isValidParkingCode(line)) {
                     return line
                 }
             }
 
-            // 2. If no full match, check for a two-line pattern (prefix + suffix).
+            // 4. If no full match, check for a two-line pattern (prefix + suffix).
             if (prefixRegex.matcher(line).matches()) {
                 // If the current line is a valid prefix, check the next line.
                 if (index + 1 < cleanLines.size) {
                     val nextLine = cleanLines[index + 1]
 
-                    // Skip if next line is too long
-                    if (nextLine.length > 10) continue
-
                     // Check if the next line is a valid suffix.
                     if (suffixRegex.matcher(nextLine).matches()) {
                         // If both lines match, combine them with a hyphen.
                         val combinedCode = "$line-$nextLine"
-
-                        // Skip if combined code is too long
-                        if (combinedCode.length > 7) continue
 
                         // Re-validate the combined string against the full pattern to ensure correctness.
                         if (fullRegex.matcher(combinedCode).matches()) {
@@ -91,7 +133,70 @@ class RegexDetector {
             }
         }
 
+        // 5. Try combining multiple consecutive short lines (for large text that gets split)
+        // Examples: ["B", "2"] -> "B2", ["2", "F", "2", "7"] -> "2F-27"
+        val multiLineCode = tryMultiLineCombination(cleanLines)
+        if (multiLineCode != null) {
+            println("✅ 멀티라인 조합 성공: '$multiLineCode'")
+            return multiLineCode
+        }
+
         // If no match is found after checking all lines and combinations.
+        return null
+    }
+
+    /**
+     * Helper function to try combining multiple consecutive short lines
+     */
+    private fun tryMultiLineCombination(lines: List<String>): String? {
+        // Only try if we have multiple short lines (likely from large text)
+        val shortLines = lines.filter { it.length <= 3 && it.isNotEmpty() }
+
+        if (shortLines.size < 2 || shortLines.size > 6) {
+            return null
+        }
+
+        println("🔍 멀티라인 조합 시도: $shortLines")
+
+        // Try different combinations of consecutive lines
+        for (startIndex in shortLines.indices) {
+            val maxEndIndex = minOf(startIndex + 4, shortLines.size - 1)
+
+            // Skip if range is invalid
+            if (maxEndIndex < startIndex + 1) {
+                continue
+            }
+
+            for (endIndex in (startIndex + 1)..maxEndIndex) {
+                val combinedLines = shortLines.subList(startIndex, endIndex + 1)
+
+                // Try with no separator
+                val noSep = combinedLines.joinToString("")
+                if (isValidParkingCode(noSep)) {
+                    if (fullRegex.matcher(noSep).matches()) {
+                        println("✅ 조합 성공 (구분자 없음): $combinedLines -> '$noSep'")
+                        return noSep
+                    }
+                }
+
+                // Try with hyphen between parts (e.g., ["B", "3", "1", "4"] -> "B3-14")
+                if (combinedLines.size >= 3) {
+                    for (splitPoint in 1 until combinedLines.size) {
+                        val prefix = combinedLines.subList(0, splitPoint).joinToString("")
+                        val suffix = combinedLines.subList(splitPoint, combinedLines.size).joinToString("")
+                        val withHyphen = "$prefix-$suffix"
+
+                        if (isValidParkingCode(withHyphen)) {
+                            if (fullRegex.matcher(withHyphen).matches()) {
+                                println("✅ 조합 성공 (하이픈): $combinedLines -> '$withHyphen'")
+                                return withHyphen
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         return null
     }
 

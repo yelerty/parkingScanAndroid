@@ -1,0 +1,50 @@
+<resources>
+    <string name="app_name">ParkWhere Scanner</string>
+
+    <!-- Main Activity -->
+    <string name="app_title">Parking Scanner</string>
+    <string name="scan_status_scanning">Scanning…</string>
+    <string name="scan_status_idle">Waiting to scan</string>
+    <string name="empty_state_message">No parking records</string>
+    <string name="empty_state_subtitle">Pull down to start scanning</string>
+    <string name="pull_to_refresh">Pull to refresh</string>
+
+    <!-- Menu -->
+    <string name="action_settings">Settings</string>
+    <string name="action_refresh">Refresh</string>
+    <string name="action_clear_all">Clear All Records</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="license_plate_section">License Plate Registration</string>
+    <string name="license_plate_hint">My License Plate</string>
+    <string name="save_license_plate">Save</string>
+    <string name="license_plate_saved">License plate saved</string>
+    <string name="management_section">Management</string>
+    <string name="clear_all_records">Clear All Records</string>
+    <string name="clear_all_confirmation">Are you sure you want to delete all parking records?\nAfter deletion, a full scan will automatically start to find new parking records.</string>
+    <string name="blacklist_management">Blacklist Management</string>
+    <string name="view_usage_guide">View Usage Guide</string>
+    <string name="language_setting">Language Setting</string>
+    <string name="language">Language</string>
+
+    <!-- Common -->
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="confirm">Confirm</string>
+
+    <!-- Map -->
+    <string name="map_title">Parking Location</string>
+    <string name="open_in_maps">Open in Maps</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_title">How to Use Parking Scanner</string>
+    <string name="onboarding_indoor_title">Indoor/Underground Parking</string>
+    <string name="onboarding_indoor_description">Take photos of parking column letters/numbers or floor markings. (e.g., B2-14, A-123)</string>
+    <string name="onboarding_outdoor_title">Outdoor Parking</string>
+    <string name="onboarding_outdoor_description">Take a photo of your vehicle\'s license plate. The app will automatically recognize it.</string>
+    <string name="onboarding_settings_title">Settings Tip</string>
+    <string name="onboarding_settings_description">Register your license plate number in Settings for more accurate recognition.</string>
+    <string name="onboarding_got_it">Got It</string>
+</resources>

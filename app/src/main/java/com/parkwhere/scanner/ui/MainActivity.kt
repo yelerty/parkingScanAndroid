@@ -19,6 +19,7 @@ import com.parkwhere.scanner.R
 import com.parkwhere.scanner.databinding.ActivityMainBinding
 import com.parkwhere.scanner.ui.adapters.ParkingRecordAdapter
 import com.parkwhere.scanner.ui.viewmodels.ParkingViewModel
+import com.parkwhere.scanner.utils.LocalizationManager
 import kotlinx.coroutines.launch
 import pub.devrel.easypermissions.EasyPermissions
 
@@ -49,6 +50,10 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // 언어 적용 (iOS와 동일)
+        LocalizationManager.updateConfiguration(this)
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -56,11 +61,16 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
         setupObservers()
         initializeAds()
         checkPermissions()
+
+        // 온보딩 화면 표시 (첫 실행시)
+        if (OnboardingActivity.shouldShowOnboarding(this)) {
+            startActivity(Intent(this, OnboardingActivity::class.java))
+        }
     }
 
     private fun setupUI() {
         setSupportActionBar(binding.toolbar)
-        supportActionBar?.title = "주차 스캐너"
+        supportActionBar?.title = getString(R.string.app_title)
 
         // RecyclerView 설정
         adapter = ParkingRecordAdapter(
@@ -87,13 +97,8 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
             adapter = this@MainActivity.adapter
         }
 
-        // Swipe to refresh
+        // Swipe to refresh (iOS와 동일)
         binding.swipeRefresh.setOnRefreshListener {
-            viewModel.refreshRecords()
-        }
-
-        // Floating Action Button (수동 스캔)
-        binding.fabScan.setOnClickListener {
             viewModel.performManualScan()
         }
     }
